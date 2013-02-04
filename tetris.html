@@ -1,169 +1,19 @@
 <html>
- <head>
-  <script type="application/javascript">
-	var gameOver=false;
-	var resting=false;
-
-	var board=new Array();
-			for(i=0;i<10;i++){
-				board[i]=new Array();
-		}
-
-	function boardSquare(filled, r, g, b,active){
-		this.filled=filled;
-		this.r=r;
-		this.g=g;
-		this.b=b;
-		this.active=active;
-	}
-
-	function playTetris(){
-		var boardSquarePixels=50;
-
-		var canvas = document.getElementById('canvas');
-		if (canvas.getContext) {
-        	var ctx = canvas.getContext("2d");
-		drawBoard(ctx);
-
-		for (i=0;i<10;i++){
-			for (j=0;j<20;j++)
-				board[i][j]=new boardSquare(false,0,0,0,false);
-		}
-		//while(!gameOver){
-			newPiece();
-		//	window.setTimeout(function() {newPiece2()},1000);
-		//	while(!resting){
-				setInterval(function() {fall()},100);
-				setInterval(function() {drawSquares(ctx)},100);
-		//	}
-		//}
-	}
-
-    function drawBoard() {
-        ctx.strokeRect(0,0,500,1000);
-        //drawSquare(ctx,1,1);
-        //drawCross(ctx,3,1);
-       // drawStraight(ctx,3,5);
-        //drawLZig(ctx,6,6);
-        //drawRZig(ctx,8,8);
-        //drawL(ctx,4,10);
-        //drawR(ctx,7,15);
-      }
-    }
-
-    function drawSquares(ctx){
-    	for (i=0;i<10;i++){
-					for (j=0;j<20;j++)
-						{
-							//if(board[i][j].active)
-							//{
-							ctx.fillStyle = "rgb("+board[i][j].r+","+board[i][j].g+","+board[i][j].b+")";
-        					ctx.fillRect (50*i, 50*j, 50, 50);
-        					//}
-						}
-		}
-    }
-
-	function newPiece(){
-		board[4][0]=new boardSquare(true,300,0,0,true);
-		board[5][0]=new boardSquare(true,300,0,0,true);
-		board[6][0]=new boardSquare(true,300,0,0,true);
-		//board[7][0]=new boardSquare(true,300,0,0,true);
-		board[6][1]=new boardSquare(true,300,0,0,true);
-	}
-
-	function newPiece2(){
-			board[4][0]=new boardSquare(true,300,0,0,true);
-			board[5][0]=new boardSquare(true,300,0,0,true);
-			board[6][0]=new boardSquare(true,300,0,0,true);
-			board[7][0]=new boardSquare(true,300,0,0,true);
-			board[7][1]=new boardSquare(true,300,0,0,true);
-		}
+<head>
+<script type="application/javascript" src="tetris.js"></script>
+<script type="application/javascript">
 
 
-//find the "lowest" ycoordinate square in the active block.
-//let it fall until it reaches a filled square.
-//allow other squares in the active block to fall the same number of times.
-
-	function fall(){
-
-		//find highest ycoordinate in block
-		var highestY=0;
-		for (i=0;i<10;i++){
-					for (j=0;j<20;j++){
-						if(board[i][j].active){
-							highestY=j;
-						}
-					}
-		}
-
-		for (x=0;x<10;x++){
-			for (y=18;y>=highestY;y--)
-			{//loop through rows and see if next row to piece is filled, if so stop it from falling
-				if(board[x][y].active&&board[x][y+1].filled){
-					resting=true;
-					board[x][y].active=false;
-					board[x][y].filled=true;
-				}
-			//else shift entire column higher in number
-				else if (board[x][y].active&&y<19){
-					for(y
-					//board[x][y+1]=board[x][y];
-					//board[x][y]=new boardSquare(false,0,0,0,false);
-
-
-				}
-			}
-		}
-
-
-
-	}
-    function drawSquare(ctx, x,y){
-		ctx.fillStyle = "rgb(200,0,0)";
-        ctx.fillRect (50*x, 50*y, 100, 100);
-    }
-
-    function drawCross(ctx, x,y){
-		ctx.fillStyle = "rgb(0,200,0)";
-	    ctx.fillRect ((x*50)+50, 50*y, 50, 50);
-	    ctx.fillRect (x*50, (y*50)+50, 150, 50);
-    }
-    function drawStraight(ctx, x,y){
-		ctx.fillStyle = "rgb(0,0,200)";
-		ctx.fillRect (x*50, y*50, 200, 50);
-    }
-    function drawLZig(ctx, x,y){
-		ctx.fillStyle = "rgb(200,0,200)";
-		ctx.fillRect (x*50+50, y*50, 50, 50);
-		ctx.fillRect (x*50, y*50+50, 100, 50);
-		ctx.fillRect (x*50, y*50+100, 50, 50);
-    }
-    function drawRZig(ctx, x,y){
-		ctx.fillStyle = "rgb(0,200,200)";
-		ctx.fillRect (x*50, y*50, 50, 50);
-		ctx.fillRect (x*50, y*50+50, 100, 50);
-		ctx.fillRect (x*50+50, y*50+100, 50, 50);
-	}
-	function drawL(ctx, x,y){
-			ctx.fillStyle = "rgb(0,800,800)";
-			ctx.fillRect (x*50, y*50, 50, 50);
-			ctx.fillRect (x*50, y*50+50, 50, 50);
-			ctx.fillRect (x*50, y*50+100, 100, 50);
-	}
-	function drawR(ctx, x,y){
-			ctx.fillStyle = "rgb(800,800,0)";
-			ctx.fillRect (x*50+50, y*50, 50, 50);
-			ctx.fillRect (x*50+50, y*50+50, 50, 50);
-			ctx.fillRect (x*50, y*50+100, 100, 50);
-	}
-
-
-
-
-  </script>
- </head>
- <body onload="playTetris();">
-   <canvas id="canvas" width="1000" height="2000"></canvas>
- </body>
+</script>
+</head>
+<body onload="playTetris();">
+	<div>-Tetris-
+	<br>Left Arrow=Move Left
+	<br>Right Arrow=Move Right
+	<br>Down Arrow=Drop Piece
+	<br>Up Arrow=Rotate Piece
+	</div>
+	Points:<div id="points"></div>
+	<canvas id="canvas" width="1000" height="1100"></canvas>
+</body>
 </html>
