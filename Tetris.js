@@ -6,6 +6,12 @@ var isThereActivePiece=false;
 var stop=false;
 var points=0;
 var ctx;
+var easy=1;
+var medium=3;
+var hard=5;
+var difficulty=easy;//default
+var piecesPlayed=0;//counter for how many pieces. used for speeding up difficulty
+var rate=1;
 
 var pointsId; //points to html div for representing points
 
@@ -182,7 +188,6 @@ function StraightPiece(){
 
 	//rotate for straightpiece only has two positions 1-horizontal, 2-vertical
 	this.rotate=function (){
-		//first check if the squares rotated are not filled and not on edge. otherwise do nothing
 			if (this.pos==1){
 				if((this.p1x+1)>0&&(this.p2x)>0&&(this.p3x-1)>0&&(this.p4x-2)>0
 						&&(this.p1x-1)<10&&(this.p2x)<10&&(this.p3x-1)<10&&(this.p4x-2)<10
@@ -302,7 +307,6 @@ function StepPiece(){
 				this.p1y=this.p1y-2;
 				this.p2y=this.p2y-1;
 				this.p3x=this.p3x-1;
-				//this.p4x=this.p4x+1;
 				this.p4y=this.p4y+1;
 				
 				this.pos=1;
@@ -336,8 +340,15 @@ function LPiece(){
 	this.rotate=function (){
 		//first check if the squares rotated are not filled and not on edge. otherwise do nothing
 		if (this.pos==1){
-			if(board[this.p1x+2][this.p1y+1].filled==false&&board[this.p2x+1][this.p2y+2].filled==false&&board[this.p4x-1][this.p4y].filled==false)
-			{					
+			
+			if((this.p1x+2)>0&&(this.p2x+1)>0&&(this.p3x)>0&&(this.p4x-1)>0
+				&&(this.p1x+2)<10&&(this.p2x+1)<10&&(this.p3x)<10&&(this.p4x-1)<10
+				&&(this.p1y+1)>0&&(this.p2y+2)>0&&(this.p3y+1)>0&&(this.p4y)>0
+				&&(this.p1y+1)<20&&(this.p2y+2)<20&&(this.p3y+1<20)&&(this.p4y)<20){
+				if(!(board[this.p1x+2][this.p1y+1].filled==true&&board[this.p1x+2][this.p1y+1].active==false)&&
+					!(board[this.p2x+1][this.p2y+2].filled==true&&board[this.p2x+1][this.p2y+2].active==false)&&
+					!(board[this.p3x][this.p3y+1].filled==true&&board[this.p3x][this.p3y+1].active==false)&&
+					!(board[this.p4x-1][this.p4y].filled==true&&board[this.p4x-1][this.p4y].active==false)){						
 				board[this.p1x+2][this.p1y+1]=board[this.p1x][this.p1y];
 				board[this.p1x][this.p1y]=new boardSquare(false,0,0,0,false);
 				board[this.p2x+1][this.p2y+2]=board[this.p2x][this.p2y];
@@ -354,53 +365,86 @@ function LPiece(){
 				this.p3y=this.p3y+1;
 				this.p4x=this.p4x-1;
 
-				this.pos=2;}
+				this.pos=2;
+				}
+			}
 		}
 		else if (this.pos==2){
-			board[this.p1x-1][this.p1y+1]=board[this.p1x][this.p1y];
-			board[this.p1x][this.p1y]=new boardSquare(false,0,0,0,false);
-			board[this.p2x-2][this.p2y]=board[this.p2x][this.p2y];
-			board[this.p2x][this.p2y]=new boardSquare(false,0,0,0,false);
-			board[this.p3x-1][this.p3y-1]=board[this.p3x][this.p3y];
-			board[this.p4x][this.p4y-2]=board[this.p4x][this.p4y];	
-			this.p1x=this.p1x-1;
-			this.p1y=this.p1y+1;
-			this.p2x=this.p2x-2;
-			this.p3x=this.p3x-1;
-			this.p3y=this.p3y-1;
-			this.p4y=this.p4y-2;
+			if((this.p1x-1)>0&&(this.p2x-2)>0&&(this.p3x-1)>0&&(this.p4x)>0
+							&&(this.p1x-1)<10&&(this.p2x-2)<10&&(this.p3x-1)<10&&(this.p4x)<10
+							&&(this.p1y+1)>0&&(this.p2y+2)>0&&(this.p3y-1)>0&&(this.p4y-2)>0
+							&&(this.p1y+1)<20&&(this.p2y+2)<20&&(this.p3y-1)<20&&(this.p4y-2)<20){
+				if(!(board[this.p1x-1][this.p1y+1].filled==true&&board[this.p1x-1][this.p1y+1].active==false)&&
+					!(board[this.p2x-2][this.p2y].filled==true&&board[this.p2x-2][this.p2y].active==false)&&
+					!(board[this.p3x-1][this.p3y+1].filled==true&&board[this.p3x-1][this.p3y+1].active==false)&&
+					!(board[this.p4x][this.p4y-2].filled==true&&board[this.p4x][this.p4y-2].active==false)){	
+					board[this.p1x-1][this.p1y+1]=board[this.p1x][this.p1y];
+					board[this.p1x][this.p1y]=new boardSquare(false,0,0,0,false);
+					board[this.p2x-2][this.p2y]=board[this.p2x][this.p2y];
+					board[this.p2x][this.p2y]=new boardSquare(false,0,0,0,false);
+					board[this.p3x-1][this.p3y-1]=board[this.p3x][this.p3y];
+					board[this.p4x][this.p4y-2]=board[this.p4x][this.p4y];	
+					this.p1x=this.p1x-1;
+					this.p1y=this.p1y+1;
+					this.p2x=this.p2x-2;
+					this.p3x=this.p3x-1;
+					this.p3y=this.p3y-1;
+					this.p4y=this.p4y-2;
 
-			this.pos=3;
+					this.pos=3;
+				}
+			}
 		}
 		else if (this.pos==3){
-			board[this.p1x-1][this.p1y]=board[this.p1x][this.p1y];
-			board[this.p1x][this.p1y]=new boardSquare(false,0,0,0,false);
-			board[this.p2x][this.p2y-1]=board[this.p2x][this.p2y];
-			board[this.p3x+1][this.p3y]=board[this.p3x][this.p3y];
-			board[this.p4x+2][this.p4y+1]=board[this.p4x][this.p4y];
-			board[this.p4x][this.p4y]=new boardSquare(false,0,0,0,false);
-			this.p1x=this.p1x-1;
-			this.p2y=this.p2y-1;
-			this.p3x=this.p3x+1;	
-			this.p4x=this.p4x+2;
-			this.p4y=this.p4y+1;
+			if((this.p1x-1)>0&&(this.p2x)>0&&(this.p3x+1)>0&&(this.p4x+2)>0
+							&&(this.p1x-1)<10&&(this.p2x)<10&&(this.p3x+1)<10&&(this.p4x+2)<10
+							&&(this.p1y)>0&&(this.p2y-1)>0&&(this.p3y)>0&&(this.p4y+1)>0
+							&&(this.p1y)<20&&(this.p2y-1)<20&&(this.p3y)<20&&(this.p4y+1)<20){
+				if(!(board[this.p1x-1][this.p1y].filled==true&&board[this.p1x-1][this.p1y].active==false)&&
+					!(board[this.p2x][this.p2y-1].filled==true&&board[this.p2x][this.p2y-1].active==false)&&
+					!(board[this.p3x+1][this.p3y].filled==true&&board[this.p3x+1][this.p3y].active==false)&&
+					!(board[this.p4x][this.p4y+1].filled==true&&board[this.p4x][this.p4y+1].active==false)){
+					
+					board[this.p1x-1][this.p1y]=board[this.p1x][this.p1y];
+					board[this.p1x][this.p1y]=new boardSquare(false,0,0,0,false);
+					board[this.p2x][this.p2y-1]=board[this.p2x][this.p2y];
+					board[this.p3x+1][this.p3y]=board[this.p3x][this.p3y];
+					board[this.p4x+2][this.p4y+1]=board[this.p4x][this.p4y];
+					board[this.p4x][this.p4y]=new boardSquare(false,0,0,0,false);
+					this.p1x=this.p1x-1;
+					this.p2y=this.p2y-1;
+					this.p3x=this.p3x+1;	
+					this.p4x=this.p4x+2;
+					this.p4y=this.p4y+1;
 
-			this.pos=4;
+					this.pos=4;
+				}
+			}	
 		}
 		else if (this.pos==4){
-			board[this.p1x][this.p1y-2]=board[this.p1x][this.p1y];
-			board[this.p1x][this.p1y]=new boardSquare(false,0,0,0,false);
-			board[this.p2x+1][this.p2y-1]=board[this.p2x][this.p2y];
-			board[this.p2x][this.p2y]=new boardSquare(false,0,0,0,false);
-			board[this.p4x-1][this.p4y+1]=board[this.p4x][this.p4y];
-			board[this.p4x][this.p4y]=new boardSquare(false,0,0,0,false);
-			this.p1y=this.p1y-2;
-			this.p2x=this.p2x+1;
-			this.p2y=this.p2y-1;
-			this.p4x=this.p4x-1;
-			this.p4y=this.p4y+1;
+			if((this.p1x)>0&&(this.p2x+1)>0&&(this.p3x)>0&&(this.p4x-1)>0
+							&&(this.p1x)<10&&(this.p2x+1)<10&&(this.p3x)<10&&(this.p4x-1)<10
+							&&(this.p1y-2)>0&&(this.p2y-1)>0&&(this.p3y)>0&&(this.p4y+1)>0
+							&&(this.p1y-2)<20&&(this.p2y-1)<20&&(this.p3y)<20&&(this.p4y+1)<20){
+				if(!(board[this.p1x][this.p1y-2].filled==true&&board[this.p1x][this.p1y-2].active==false)&&
+					!(board[this.p2x+1][this.p2y-1].filled==true&&board[this.p2x+1][this.p2y-1].active==false)&&
+					!(board[this.p4x-1][this.p4y+1].filled==true&&board[this.p4x-1][this.p4y+1].active==false)){
+					
+					board[this.p1x][this.p1y-2]=board[this.p1x][this.p1y];
+					board[this.p1x][this.p1y]=new boardSquare(false,0,0,0,false);
+					board[this.p2x+1][this.p2y-1]=board[this.p2x][this.p2y];
+					board[this.p2x][this.p2y]=new boardSquare(false,0,0,0,false);
+					board[this.p4x-1][this.p4y+1]=board[this.p4x][this.p4y];
+					board[this.p4x][this.p4y]=new boardSquare(false,0,0,0,false);
+					this.p1y=this.p1y-2;
+					this.p2x=this.p2x+1;
+					this.p2y=this.p2y-1;
+					this.p4x=this.p4x-1;
+					this.p4y=this.p4y+1;
 
-			this.pos=1;		
+					this.pos=1;		
+				}
+			}
 		}
 	};
 }
@@ -429,62 +473,99 @@ function CrossPiece(){
 	this.rotate=function (){
 		//first check if the squares rotated are not filled and not on edge. otherwise do nothing
 		if (this.pos==1){
-			//if(board[this.p1x+1][this.p1y].filled==false&&board[this.p2x][this.p2y-1].filled==false&&board[this.p4x-1][this.p4y].filled==false)
-			//	{					
-			board[this.p1x+1][this.p1y-1]=board[this.p1x][this.p1y];
-			board[this.p3x-1][this.p3y+1]=board[this.p3x][this.p3y];
-			board[this.p3x][this.p3y]=new boardSquare(false,0,0,0,false);
-			board[this.p4x-1][this.p4y-1]=board[this.p4x][this.p4y];
-			this.p1x=this.p1x+1;
-			this.p1y=this.p1y-1;
-			this.p3x=this.p3x-1;
-			this.p3y=this.p3y+1;
-			this.p4x=this.p4x-1;
-			this.p4y=this.p4y-1;
+			if((this.p1x+1)>0&&(this.p2x)>0&&(this.p3x-1)>0&&(this.p4x-1)>0
+				&&(this.p1x+1<10&&(this.p2x)<10&&(this.p3x-1)<10&&(this.p4x-1)<10
+				&&(this.p1y-1)>0&&(this.p2y)>0&&(this.p3y+1)>0&&(this.p4y+1)>0
+				&&(this.p1y-1)<20&&(this.p2y)<20&&(this.p3y+1)<20&&(this.p4y+1)<20)){
+				if(!(board[this.p1x+1][this.p1y-1].filled==true&&board[this.p1x+1][this.p1y-1].active==false)&&
+					!(board[this.p2x][this.p2y].filled==true&&board[this.p2x][this.p2y].active==false)&&
+					!(board[this.p4x-1][this.p4y-1].filled==true&&board[this.p4x-1][this.p4y-1].active==false)){				
+					board[this.p1x+1][this.p1y-1]=board[this.p1x][this.p1y];
+					board[this.p3x-1][this.p3y+1]=board[this.p3x][this.p3y];
+					board[this.p3x][this.p3y]=new boardSquare(false,0,0,0,false);
+					board[this.p4x-1][this.p4y-1]=board[this.p4x][this.p4y];
+					
+					this.p1x=this.p1x+1;
+					this.p1y=this.p1y-1;
+					this.p3x=this.p3x-1;
+					this.p3y=this.p3y+1;
+					this.p4x=this.p4x-1;
+					this.p4y=this.p4y-1;
 
-			this.pos=2;}
-		//}
+					this.pos=2;
+				}
+			}
+		}
 		else if (this.pos==2){
-			board[this.p1x+1][this.p1y+1]=board[this.p1x][this.p1y];
-			board[this.p3x-1][this.p3y-1]=board[this.p3x][this.p3y];
-			board[this.p3x][this.p3y]=new boardSquare(false,0,0,0,false);
-			board[this.p4x+1][this.p4y-1]=board[this.p4x][this.p4y];	
-			this.p1x=this.p1x+1;
-			this.p1y=this.p1y+1;
-			this.p3x=this.p3x-1;
-			this.p3y=this.p3y-1;
-			this.p4x=this.p3x+1;
-			this.p4y=this.p4y-1;
-
-			this.pos=3;
+			if((this.p1x+1)>0&&(this.p2x)>0&&(this.p3x-1)>0&&(this.p4x+1)>0
+				&&(this.p1x+1<10&&(this.p2x)<10&&(this.p3x-1)<10&&(this.p4x+1)<10
+				&&(this.p1y+1)>0&&(this.p2y)>0&&(this.p3y-1)>0&&(this.p4y-1)>0
+				&&(this.p1y+1)<20&&(this.p2y)<20&&(this.p3y-1)<20&&(this.p4y-1)<20)){
+				if(!(board[this.p1x+1][this.p1y+1].filled==true&&board[this.p1x+1][this.p1y+1].active==false)&&
+					!(board[this.p3x-1][this.p3y-1].filled==true&&board[this.p3x-1][this.p3y-1].active==false)&&
+					!(board[this.p4x+1][this.p4y-1].filled==true&&board[this.p4x+1][this.p4y-1].active==false)){			
+					board[this.p1x+1][this.p1y+1]=board[this.p1x][this.p1y];
+					board[this.p3x-1][this.p3y-1]=board[this.p3x][this.p3y];
+					board[this.p3x][this.p3y]=new boardSquare(false,0,0,0,false);
+					board[this.p4x+1][this.p4y-1]=board[this.p4x][this.p4y];
+					
+					this.p1x=this.p1x+1;
+					this.p1y=this.p1y+1;
+					this.p3x=this.p3x-1;
+					this.p3y=this.p3y-1;
+					this.p4x=this.p4x+1;
+					this.p4y=this.p4y-1;
+		
+					this.pos=3;
+				}
+			}
 		}
 		else if (this.pos==3){
-			board[this.p1x-1][this.p1y+1]=board[this.p1x][this.p1y];		
-			board[this.p3x+1][this.p3y-1]=board[this.p3x][this.p3y];
-			board[this.p3x][this.p3y]=new boardSquare(false,0,0,0,false);
-			board[this.p4x+1][this.p4y+1]=board[this.p4x][this.p4y];		
-			this.p1x=this.p1x-1;
-			this.p1y=this.p1y+1;		
-			this.p3x=this.p3x+1;	
-			this.p3y=this.p3y-1;
-			this.p4x=this.p4x+1;
-			this.p4y=this.p4y+1;
-
-			this.pos=4;
+			if((this.p1x-1)>0&&(this.p2x)>0&&(this.p3x+1)>0&&(this.p4x+1)>0
+					&&(this.p1x-1<10&&(this.p2x)<10&&(this.p3x+1)<10&&(this.p4x+1)<10
+					&&(this.p1y+1)>0&&(this.p2y)>0&&(this.p3y-1)>0&&(this.p4y+1)>0
+					&&(this.p1y+1)<20&&(this.p2y)<20&&(this.p3y-1)<20&&(this.p4y+1)<20)){
+					if(!(board[this.p1x-1][this.p1y+1].filled==true&&board[this.p1x-1][this.p1y+1].active==false)&&
+						!(board[this.p3x+1][this.p3y-1].filled==true&&board[this.p3x+1][this.p3y-1].active==false)&&
+						!(board[this.p4x+1][this.p4y+1].filled==true&&board[this.p4x+1][this.p4y+1].active==false)){		
+					board[this.p1x-1][this.p1y+1]=board[this.p1x][this.p1y];		
+					board[this.p3x+1][this.p3y-1]=board[this.p3x][this.p3y];
+					board[this.p3x][this.p3y]=new boardSquare(false,0,0,0,false);
+					board[this.p4x+1][this.p4y+1]=board[this.p4x][this.p4y];		
+					this.p1x=this.p1x-1;
+					this.p1y=this.p1y+1;		
+					this.p3x=this.p3x+1;	
+					this.p3y=this.p3y-1;
+					this.p4x=this.p4x+1;
+					this.p4y=this.p4y+1;
+		
+					this.pos=4;
+				}
+			}
 		}
 		else if (this.pos==4){
-			board[this.p1x-1][this.p1y-1]=board[this.p1x][this.p1y];
-			board[this.p3x+1][this.p3y+1]=board[this.p3x][this.p3y];
-			board[this.p3x][this.p3y]=new boardSquare(false,0,0,0,false);
-			board[this.p4x-1][this.p4y+1]=board[this.p4x][this.p4y];
-			this.p1x=this.p1x-1;
-			this.p1y=this.p1y-1;
-			this.p3x=this.p3x+1;
-			this.p3y=this.p3y+1;
-			this.p4x=this.p4x-1;
-			this.p4y=this.p4y+1;
-
-			this.pos=1;		
+			if((this.p1x-1)>0&&(this.p2x)>0&&(this.p3x+1)>0&&(this.p4x-1)>0
+					&&(this.p1x-1<10&&(this.p2x)<10&&(this.p3x+1)<10&&(this.p4x-1)<10
+					&&(this.p1y-1)>0&&(this.p2y)>0&&(this.p3y+1)>0&&(this.p4y+1)>0
+					&&(this.p1y-1)<20&&(this.p2y)<20&&(this.p3y+1)<20&&(this.p4y+1)<20)){
+					if(!(board[this.p1x-1][this.p1y-1].filled==true&&board[this.p1x-1][this.p1y-1].active==false)&&
+						!(board[this.p3x+1][this.p3y+1].filled==true&&board[this.p3x+1][this.p3y+1].active==false)&&
+						!(board[this.p4x-1][this.p4y+1].filled==true&&board[this.p4x-1][this.p4y+1].active==false)){		
+					
+					board[this.p1x-1][this.p1y-1]=board[this.p1x][this.p1y];
+					board[this.p3x+1][this.p3y+1]=board[this.p3x][this.p3y];
+					board[this.p3x][this.p3y]=new boardSquare(false,0,0,0,false);
+					board[this.p4x-1][this.p4y+1]=board[this.p4x][this.p4y];
+					this.p1x=this.p1x-1;
+					this.p1y=this.p1y-1;
+					this.p3x=this.p3x+1;
+					this.p3y=this.p3y+1;
+					this.p4x=this.p4x-1;
+					this.p4y=this.p4y+1;
+		
+					this.pos=1;		
+					}
+			}
 		}
 	};
 }
@@ -518,12 +599,15 @@ function playTetris(){
 		else if (!isThereActivePiece){
 			clearFilledRows();
 			activePiece=newPiece();
-			pieceDead=setInterval(function() {activePiece.moveDown();},100);
+			piecesPlayed++;
+			rate=((piecesPlayed/10)+1)*difficulty;//this rate function is very elementary now. accelerates quite fast
+
+			pieceDead=setInterval(function() {activePiece.moveDown();},500/rate);
 
 		}
 	}
 	function newPiece(){
-		var randomNumber=Math.floor((Math.random()*1)+5);
+		var randomNumber=Math.floor((Math.random()*5)+1);
 
 		if(randomNumber==1){
 			SquarePiece.prototype=new Piece();
